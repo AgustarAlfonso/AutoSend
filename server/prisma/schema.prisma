@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  username     String     @unique
+  passwordHash String     @map("password_hash")
+  contacts     Contact[]
+  schedules    Schedule[]
+  waSession    WaSession?
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Contact {
+  id          String              @id @default(uuid())
+  userId      String              @map("user_id")
+  user        User                @relation(fields: [userId], references: [id])
+  phoneNumber String              @map("phone_number")
+  name        String
+  schedules   ScheduleRecipient[]
+  logs        MessageLog[]
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  @@map("contacts")
+}
+
+model Schedule {
+  id             String              @id @default(uuid())
+  userId         String              @map("user_id")
+  user           User                @relation(fields: [userId], references: [id])
+  title          String
+  message        String
+  mediaUrl       String?             @map("media_url")
+  mediaType      MediaType?          @map("media_type")
+  scheduleType   ScheduleType        @map("schedule_type")
+  cronExpression String?             @map("cron_expression")
+  scheduledAt    DateTime            @map("scheduled_at")
+  endsAt         DateTime?           @map("ends_at")
+  maxRepeats     Int?                @map("max_repeats")
+  repeatCount    Int                 @default(0) @map("repeat_count")
+  status         ScheduleStatus      @default(ACTIVE)
+  recipients     ScheduleRecipient[]
+  logs           MessageLog[]
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+
+  @@map("schedules")
+}
+
+model ScheduleRecipient {
+  id         String   @id @default(uuid())
+  scheduleId String   @map("schedule_id")
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  contactId  String   @map("contact_id")
+  contact    Contact  @relation(fields: [contactId], references: [id])
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([scheduleId, contactId])
+  @@map("schedule_recipients")
+}
+
+model MessageLog {
+  id           String    @id @default(uuid())
+  scheduleId   String    @map("schedule_id")
+  schedule     Schedule  @relation(fields: [scheduleId], references: [id])
+  contactId    String    @map("contact_id")
+  contact      Contact   @relation(fields: [contactId], references: [id])
+  phoneNumber  String    @map("phone_number")
+  status       LogStatus @default(PENDING)
+  errorMessage String?   @map("error_message")
+  scheduledFor DateTime  @map("scheduled_for")
+  sentAt       DateTime? @map("sent_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("message_logs")
+}
+
+model WaSession {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  sessionData Json     @map("session_data")
+  isConnected Boolean  @default(false) @map("is_connected")
+  lastActive  DateTime @default(now()) @map("last_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("wa_sessions")
+}
+
+enum MediaType {
+  IMAGE
+  DOCUMENT
+  VIDEO
+}
+
+enum ScheduleType {
+  ONCE
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+}
+
+enum ScheduleStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum LogStatus {
+  PENDING
+  SENT
+  FAILED
+  MISSED
+  RETRIED
+}

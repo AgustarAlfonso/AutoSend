@@ -1,0 +1,31 @@
+{
+    "name": "autosend-server",
+    "version": "1.0.0",
+    "description": "AutoSend Backend Server",
+    "main": "src/index.js",
+    "scripts": {
+        "dev": "nodemon src/index.js",
+        "start": "node src/index.js",
+        "db:migrate": "npx prisma migrate dev",
+        "db:seed": "node prisma/seed.js",
+        "db:studio": "npx prisma studio"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.22.0",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "cron-parser": "^5.5.0",
+        "dotenv": "^16.4.5",
+        "express": "^4.21.0",
+        "jsonwebtoken": "^9.0.2",
+        "multer": "^1.4.5-lts.1",
+        "node-cron": "^3.0.3",
+        "socket.io": "^4.7.5",
+        "whatsapp-web.js": "^1.26.0",
+        "winston": "^3.14.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.4",
+        "prisma": "^5.22.0"
+    }
+}
