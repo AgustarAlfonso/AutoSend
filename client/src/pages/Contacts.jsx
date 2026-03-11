@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Trash2, Edit2, Search } from 'lucide-react';
+import { Users, Plus, Trash2, Edit2, Search, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
 
@@ -13,6 +13,7 @@ export default function Contacts() {
     const [editingContact, setEditingContact] = useState(null);
     const [formData, setFormData] = useState({ name: '', phoneNumber: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
 
     useEffect(() => {
         fetchContacts();
@@ -83,6 +84,31 @@ export default function Contacts() {
         }
     };
 
+    const handleClearAll = async () => {
+        if (!window.confirm('PERINGATAN: Anda yakin ingin menghapus SEMUA kontak? Pekerjaan ini tidak bisa dibatalkan.')) return;
+
+        try {
+            await api.delete('/contacts/all');
+            toast.success('Semua kontak berhasil dibersihkan');
+            fetchContacts();
+        } catch (error) {
+            toast.error('Gagal menghapus semua kontak');
+        }
+    };
+
+    const handleSyncWa = async () => {
+        try {
+            setIsSyncing(true);
+            const res = await api.post('/contacts/sync');
+            toast.success(`Sinkronisasi berhasil! ${res.data.syncedCount} kontak baru ditambahkan`);
+            fetchContacts();
+        } catch (error) {
+            toast.error(error.response?.data?.error?.message || 'Gagal sinkronisasi kontak WA. Pastikan perangkat terhubung.');
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
     const filteredContacts = contacts.filter(c =>
         c.name.toLowerCase().includes(search.toLowerCase()) ||
         c.phoneNumber.includes(search)
@@ -95,13 +121,32 @@ export default function Contacts() {
                     <Users className="w-7 h-7 text-[var(--color-primary)]" />
                     <h1 className="text-2xl font-bold">Kontak</h1>
                 </div>
-                <button
-                    onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors"
-                >
-                    <Plus className="w-5 h-5" />
-                    Tambah Kontak
-                </button>
+                <div className="flex items-center gap-2">
+                    {contacts.length > 0 && (
+                        <button
+                            onClick={handleClearAll}
+                            className="flex items-center gap-2 bg-[#ef4444]/10 border border-[var(--color-danger)] text-[var(--color-danger)] px-4 py-2 rounded-lg hover:bg-[#ef4444]/20 transition-colors mr-2"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                            Hapus Semua
+                        </button>
+                    )}
+                    <button
+                        onClick={handleSyncWa}
+                        disabled={isSyncing}
+                        className="flex items-center gap-2 bg-[var(--color-bg-input)] border border-[var(--color-border)] text-white px-4 py-2 rounded-lg hover:bg-[#475569] transition-colors disabled:opacity-50"
+                    >
+                        <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
+                        Sync WA
+                    </button>
+                    <button
+                        onClick={() => handleOpenModal()}
+                        className="flex items-center gap-2 bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Tambah Kontak
+                    </button>
+                </div>
             </div>
 
             <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] flex-1 overflow-hidden flex flex-col">
