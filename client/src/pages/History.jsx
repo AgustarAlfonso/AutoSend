@@ -82,7 +82,7 @@ export default function History() {
             <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] flex-1 flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-auto">
                     {loading ? (
-                        <div className="p-8 text-center text-[var(--color-text-muted)]">Loading...</div>
+                        <div className="p-8 flex items-center justify-center gap-3 text-[var(--color-text-muted)]"><div className="spinner-neon" style={{width:'24px',height:'24px',borderWidth:'2px'}} />loading riwayat...</div>
                     ) : logs.length === 0 ? (
                         <div className="p-8 flex flex-col items-center justify-center text-[var(--color-text-muted)] h-full min-h-[300px]">
                             <HistoryIcon className="w-12 h-12 mb-4 opacity-50" />
@@ -91,7 +91,7 @@ export default function History() {
                     ) : (
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-[var(--color-border)] text-sm text-[var(--color-text-muted)] bg-[#1e293b] sticky top-0">
+                                <tr className="border-b border-[var(--color-border)] text-sm text-[var(--color-text-muted)] bg-[var(--color-bg-card)] sticky top-0">
                                     <th className="p-4 font-medium w-12 text-center">Status</th>
                                     <th className="p-4 font-medium">Jadwal Asal</th>
                                     <th className="p-4 font-medium">Penerima</th>
@@ -132,7 +132,7 @@ export default function History() {
                                             {(log.status === 'FAILED' || log.status === 'MISSED') && (
                                                 <button
                                                     onClick={() => handleRetry(log.id)}
-                                                    className="mt-2 inline-flex items-center gap-1.5 text-xs bg-[#334155] border border-gray-600 hover:bg-gray-700 px-3 py-1.5 rounded-md transition-colors"
+                                                    className="mt-2 inline-flex items-center gap-1.5 text-xs bg-[var(--color-bg-input)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] px-3 py-1.5 rounded-md transition-colors"
                                                 >
                                                     <RotateCcw className="w-3.5 h-3.5" />
                                                     Retry

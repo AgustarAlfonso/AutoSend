@@ -63,7 +63,7 @@ export default function Schedules() {
                 </div>
                 <button
                     onClick={() => setIsFormOpen(true)}
-                    className="flex items-center gap-2 bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors"
+                    className="btn-primary flex items-center gap-2"
                 >
                     <Plus className="w-5 h-5" />
                     Buat Jadwal
@@ -89,7 +89,7 @@ export default function Schedules() {
                     {/* Table */}
                     <div className="flex-1 overflow-auto">
                         {loading ? (
-                            <div className="p-8 text-center text-[var(--color-text-muted)]">Loading...</div>
+                            <div className="p-8 flex items-center justify-center gap-3 text-[var(--color-text-muted)]"><div className="spinner-neon" style={{width:'24px',height:'24px',borderWidth:'2px'}} />loading jadwal...</div>
                         ) : filteredSchedules.length === 0 ? (
                             <div className="p-8 text-center text-[var(--color-text-muted)]">
                                 {search ? 'Tidak ada jadwal yang cocok.' : 'Belum ada jadwal. Silakan buat yang baru.'}
@@ -135,7 +135,7 @@ export default function Schedules() {
                                                 {schedule.status !== 'COMPLETED' && (
                                                     <button
                                                         onClick={() => handleTogglePause(schedule.id, schedule.status)}
-                                                        className="p-2 text-[var(--color-text-muted)] hover:text-white transition-colors rounded hover:bg-[#334155]"
+                                                        className="p-2 text-[var(--color-text-muted)] hover:text-white transition-colors rounded hover:bg-[var(--color-bg-input)]"
                                                         title={schedule.status === 'ACTIVE' ? 'Pause' : 'Resume'}
                                                     >
                                                         {schedule.status === 'ACTIVE' ? <PauseCircle className="w-5 h-5 text-[var(--color-warning)]" /> : <PlayCircle className="w-5 h-5 text-[var(--color-success)]" />}
